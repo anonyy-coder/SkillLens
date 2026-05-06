@@ -3,11 +3,11 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>SkillTestBench &middot; Skill-as-input evaluation for agent skill packages</title>
-  <meta name="description" content="SkillTestBench treats every agent skill package as the input to its own evaluation. Two deployment-facing axes — Utility (effectiveness + efficiency, reported independently) and Safety (static existence × dynamic exploitability) — derived from a single verifier-backed Harbor execution pass.">
+  <title>SkillTestBench &middot; Look up the evidence behind any agent skill</title>
+  <meta name="description" content="SkillTestBench profiles every agent skill package and reports two deployment-facing axes — Utility (effectiveness + efficiency) and Safety — derived from a single verifier-backed Harbor execution pass with paired with-skill / no-skill comparison.">
   <meta name="robots" content="noindex,nofollow">
   <meta property="og:title" content="SkillTestBench">
-  <meta property="og:description" content="Skill-as-input evaluation for agent skill packages.">
+  <meta property="og:description" content="Look up the evidence behind any agent skill.">
   <meta property="og:type" content="website">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -25,12 +25,10 @@
     </span>
   </a>
   <nav class="topnav" aria-label="Section navigation">
-    <a href="#motivation">Motivation</a>
-    <a href="#framework">Framework</a>
-    <a href="#evidence">Evidence</a>
-    <a href="#explore">Explore</a>
-    <a href="#pipeline">Pipeline</a>
-    <a href="#extension">Extension</a>
+    <a href="#verdict">Verdict</a>
+    <a href="#different">What's different</a>
+    <a href="#explore">Browse 227</a>
+    <a href="#how">How it works</a>
     <a href="#cite">Cite</a>
     <a class="cta" href="paper/neurips_2026.pdf" target="_blank" rel="noopener">Paper PDF</a>
   </nav>
@@ -38,288 +36,176 @@
 
 <main class="page" id="top">
 
-  <!-- ============================ HERO ============================ -->
+  <!-- ==================== HERO ==================== -->
   <section class="hero">
-    <div class="hero-grid">
+    <span class="hero-eyebrow"><span class="dot"></span>NeurIPS 2026 submission &middot; under double-blind review</span>
 
-      <div class="hero-text">
-        <span class="hero-eyebrow"><span class="dot"></span>NeurIPS 2026 submission &middot; under double-blind review</span>
+    <h1>Don't trust the<br><em>SKILL.md</em>. <span class="ampersand">Read</span><br>the evidence.</h1>
 
-        <h1 class="hero-title">
-          Evaluate the&nbsp;<em>skill</em>,<br>
-          <span class="ampersand">not</span> the agent.
-        </h1>
+    <p class="hero-sub">
+      Most evaluators give you a sticker — <em>pass</em>, <em>cautious</em>, <em>risky</em>. <strong>SkillTestBench
+      gives you the trace.</strong>  Per-finding rationale, paired with-skill / without-skill judge reasoning,
+      execution evidence with the actual exploit string the agent typed.
+    </p>
 
-        <p class="lead">
-          <strong>SkillTestBench</strong> treats every agent skill package as the <em>input</em> to its own
-          evaluation. Tasks are synthesized from each <code>SKILL.md</code>, calibrated to the no-skill
-          baseline, and executed twice under matched conditions — yielding two deployment-facing axes
-          from a single Harbor execution pass.
-        </p>
-
-        <div class="hero-actions">
-          <a class="btn btn-primary" href="paper/neurips_2026.pdf" target="_blank" rel="noopener">
-            <span>Read the paper</span><span class="arrow">→</span>
-          </a>
-          <a class="btn btn-secondary" href="#explore">
-            <span>Explore 227 skills</span><span class="arrow">↓</span>
-          </a>
-          <a class="btn btn-ghost" href="#evidence">
-            <span>See real evidence</span><span class="arrow">→</span>
-          </a>
-        </div>
-
-        <div class="hero-meta">
-          <span><strong>Skill-as-input</strong>, not skill-as-condition</span>
-          <span><strong>Paired</strong> wi / wo execution</span>
-          <span><strong>Difficulty-aligned</strong> generation</span>
-          <span><strong>Sandbox</strong> instrumentation</span>
-        </div>
-
-        <div class="banner-anonymous" role="note">
-          <strong>Anonymity notice.</strong>
-          This page accompanies a NeurIPS 2026 submission currently under double-blind review.
-          Author identities, code repositories, and pre-computed evaluation artifacts are
-          withheld until decision notification.
-        </div>
-      </div>
-
-      <aside class="hero-scatter" id="hero-scatter" aria-busy="true">
-        <div class="legend">
-          <span class="legend-title">Loading 227 skills…</span>
-        </div>
-      </aside>
-
+    <div class="lookup-wrap">
+      <form class="lookup-form" id="lookup-form" autocomplete="off" role="search">
+        <span class="icon" aria-hidden="true">⌕</span>
+        <input id="lookup-input"
+               type="search"
+               placeholder="Find a skill by name, owner, or category…"
+               autocomplete="off"
+               spellcheck="false"
+               aria-label="Search skills">
+        <button type="submit">Look up &rarr;</button>
+      </form>
+      <div class="lookup-options" id="lookup-options" role="listbox" aria-label="Matching skills"></div>
     </div>
 
-    <!-- Stat strip: live numbers from stats.json -->
-    <div class="stat-strip" aria-label="Evaluation totals">
-      <div class="stat">
-        <span class="num" id="stat-skills">—</span>
-        <span class="lbl">Skills evaluated</span>
-        <span class="sub">end-to-end with-skill / no-skill paired runs</span>
-      </div>
-      <div class="stat">
-        <span class="num" id="stat-categories">—</span>
-        <span class="lbl">Occupational categories</span>
-        <span class="sub">mapped to BLS occupation taxonomy</span>
-      </div>
-      <div class="stat">
-        <span class="num" id="stat-scenarios">—</span>
-        <span class="lbl">Generated scenarios</span>
-        <span class="sub">U1 / U2 / U3 per skill, baseline-calibrated</span>
-      </div>
-      <div class="stat">
-        <span class="num" id="stat-judge-items">—</span>
-        <span class="lbl">Judge items scored</span>
-        <span class="sub">binary completion under LLM judges</span>
-      </div>
-      <div class="stat">
-        <span class="num" id="stat-findings">—</span>
-        <span class="lbl">Security findings</span>
-        <span class="sub">static × dynamic, scored against a 100 baseline</span>
-      </div>
+    <div class="lookup-suggest" id="lookup-suggest">
+      <span class="lab">Try</span>
+      <button type="button" data-skill="docx">docx</button>
+      <button type="button" data-skill="boiler">boiler</button>
+      <button type="button" data-skill="ancient-divination-ritual-procedure">ancient-divination-ritual-procedure</button>
+      <button type="button" data-skill="aircraft-maintenance-engineer">aircraft-maintenance-engineer</button>
+      <button type="button" data-skill="bom-sop-check">bom-sop-check</button>
+    </div>
+
+    <p class="hero-mini-stats" id="hero-mini-stats">
+      <span><strong id="m-skills">227</strong><em>skills tested</em></span>
+      <span><strong id="m-scenarios">678</strong><em>generated scenarios</em></span>
+      <span><strong id="m-judge">4,256</strong><em>judge items scored</em></span>
+      <span><strong id="m-findings">241</strong><em>security findings</em></span>
+      <span><strong id="m-trig">93</strong><em>dynamically triggered</em></span>
+    </p>
+
+    <div class="banner-anonymous" role="note">
+      <strong>Anonymity notice.</strong>
+      This page accompanies a NeurIPS 2026 submission currently under double-blind review.
+      Author identities, code repositories, and pre-computed evaluation artifacts are
+      withheld until decision notification.
     </div>
   </section>
 
-  <!-- ============================ MOTIVATION ============================ -->
-  <section id="motivation" class="reveal">
+  <!-- ==================== VERDICT (the data is the hero) ==================== -->
+  <section id="verdict" class="verdict-section reveal">
+    <div class="verdict" id="verdict-card" data-state="loading">
+      <div class="verdict-empty" id="verdict-empty">Loading evidence…</div>
+    </div>
+  </section>
+
+  <!-- ==================== HOW WE'RE DIFFERENT ==================== -->
+  <section id="different" class="reveal">
     <div class="section-head">
-      <span class="kicker">Motivation</span>
-      <h2>Two structural failure modes that collapse skills toward zero.</h2>
+      <span class="kicker">What makes us different</span>
+      <h2>Three things every other skill evaluator skips.</h2>
       <p class="lead">
-        A naive design — run a fixed task with the skill enabled and report the resulting
-        success rate — breaks down for two structural reasons. SkillTestBench is engineered to
-        neutralize both.
+        Skill ecosystems are growing past 47,000 artifacts. Public marketplaces ship a star count, a
+        download count, and a one-line <code>SKILL.md</code> claim. SkillTestBench tries to give you the
+        thing those signals never can: <strong>direct evidence</strong> that this skill, on this task, in
+        this environment, did or did not do what it said it would.
       </p>
     </div>
 
-    <div class="failure-grid">
-      <article class="failure-card" data-num="01">
-        <span class="tag">Failure mode 1</span>
-        <h3>Baseline conflation.</h3>
-        <p>
-          Absolute success rate confounds the marginal contribution of the skill with the underlying
-          competence of the agent. A skill that reaches 78 % on a task may represent only a 3-point
-          improvement over a 75 % no-skill baseline.
-        </p>
-        <div class="fix">
-          <strong>Fix.</strong>  Paired execution. Every task is run twice — with the skill mounted
-          and without — holding agent, task, and seed fixed.
+    <div class="contrast-grid">
+
+      <article class="contrast-card">
+        <span class="contrast-num">01</span>
+        <h3>Verdict isn't evidence.</h3>
+        <div class="contrast-vs">
+          <div class="row them">
+            <span class="who">Most evaluators</span>
+            <span class="what">A label: <em>pass / cautious / risky</em>. A traffic-light score.</span>
+          </div>
+          <div class="row us">
+            <span class="who">We</span>
+            <span class="what">Per-finding rationale text taken verbatim from the dynamic test —
+              the actual exploit string the agent typed, the file it touched, the response that came
+              back.</span>
+          </div>
         </div>
+        <p class="contrast-evidence">
+          Example finding (<b>boiler</b>, F-002):  <em>"Step 18 trajectory shows 'sed: -e expression
+          #1, char 25: unknown option to `s'' confirming the pipe character in 'data_dir|injected'
+          broke the sed delimiter, and both verifier tests passed; the config file contains
+          'data_dir|injected=testval' as a spurious key, proving end-to-end injection."</em>
+        </p>
       </article>
 
-      <article class="failure-card" data-num="02">
-        <span class="tag">Failure mode 2</span>
-        <h3>Difficulty misalignment.</h3>
-        <p>
-          Tasks too easy (baseline near 1) or too hard (baseline near 0) leave little room for a skill
-          to reveal value. An evaluation that mixes such cases indiscriminately collapses most skills
-          toward U ≈ 0 even when they are useful.
-        </p>
-        <div class="fix">
-          <strong>Fix.</strong>  Baseline-calibrated, difficulty-aligned task generation, seeded from
-          each skill's own profile rather than a fixed suite.
-        </div>
-      </article>
-    </div>
-  </section>
-
-  <!-- ============================ FRAMEWORK ============================ -->
-  <section id="framework" class="reveal">
-    <div class="section-head">
-      <span class="kicker">The framework</span>
-      <h2>Two deployment-facing axes, one execution pass.</h2>
-      <p class="lead">
-        Each containerized run produces a single evidence bundle — verifier reward, execution
-        trajectory, file-system delta, and outbound network log. <strong>Utility</strong> reports
-        two sub-dimensions independently and <em>does not</em> combine them; <strong>Safety</strong>
-        composes static existence with dynamic exploitability into a 100-based deduction score.
-      </p>
-    </div>
-
-    <div class="axes-grid">
-
-      <article class="axis-card is-utility">
-        <header class="axis-head">
-          <h3>Axis <em>1</em>.  Utility</h3>
-          <span class="axis-num">value over baseline</span>
-        </header>
-        <p class="axis-lead">
-          The skill's value relative to a no-skill baseline. Reported as <strong>two independent
-          sub-dimensions</strong> so capability gains and resource savings are read separately,
-          never silently averaged.
-        </p>
-
-        <div class="subdim">
-          <div class="name"><strong>1a. Effectiveness</strong><code>pass_rate_gain</code></div>
-          <p>Proportion of judge items the skill <em>additionally</em> unlocks beyond baseline,
-            measured per scenario across 5–6 binary judge items.</p>
-          <code class="formula">pass_rate_gain =
-  0                                       if  wi_passed = 0
-  0                                       if  0 &lt; wi_passed ≤ wo_passed
-  (wi_passed - wo_passed) / total_items   otherwise</code>
-          <div class="note">
-            Absolute item-count differences over total items — not the relative form
-            <code>(wi-wo)/(1-wo)</code> — keep the metric stable across baseline regimes when
-            judge items are discrete and few.
+      <article class="contrast-card">
+        <span class="contrast-num">02</span>
+        <h3>Pass rate isn't skill value.</h3>
+        <div class="contrast-vs">
+          <div class="row them">
+            <span class="who">Most evaluators</span>
+            <span class="what">Run a fixed task suite with the skill enabled, report the pass rate.</span>
+          </div>
+          <div class="row us">
+            <span class="who">We</span>
+            <span class="what">Run every task <em>twice</em> — with the skill mounted, and without —
+              with agent, task, and seed held fixed. The number you see is the marginal contribution
+              of the skill, not the agent's underlying competence.</span>
           </div>
         </div>
-
-        <div class="subdim">
-          <div class="name"><strong>1b. Efficiency</strong><code>efficiency_score</code></div>
-          <p>Resource savings on tasks where both wi and wo runs completed at least one item.
-            Time and effective tokens (input minus cache) contribute equally.</p>
-          <code class="formula">time_score  = clamp((wo_time - wi_time) / wo_time, 0, 1)
-token_score = clamp((wo_tok  - wi_tok)  / wo_tok,  0, 1)
-efficiency_score = (time_score + token_score) / 2</code>
-          <div class="note">
-            <strong>Reported separately</strong> from effectiveness. A skill can lift task
-            completion without saving resources, and vice versa — both are deployment-relevant.
-          </div>
-        </div>
+        <p class="contrast-evidence">
+          On <b>docx</b>:  the agent passes <b>11 / 21</b> judge items with the skill, <b>4 / 21</b>
+          without — <b>+33 percentage points</b> attributable to the skill itself, not to the model.
+        </p>
       </article>
 
-      <article class="axis-card is-safety">
-        <header class="axis-head">
-          <h3>Axis <em>2</em>.  Safety</h3>
-          <span class="axis-num">risk under runtime evidence</span>
-        </header>
-        <p class="axis-lead">
-          A 100-based score derived per skill: each static finding has an existence probability,
-          each dynamic test produces an exploitability probability, and the product weights a base
-          deduction drawn from the finding's severity tier.
+      <article class="contrast-card">
+        <span class="contrast-num">03</span>
+        <h3>Static scan isn't real risk.</h3>
+        <div class="contrast-vs">
+          <div class="row them">
+            <span class="who">Most evaluators</span>
+            <span class="what">Flag pattern matches in source code: shell sinks, eval calls, network
+              constants. Risk is whatever the regex says is risk.</span>
+          </div>
+          <div class="row us">
+            <span class="who">We</span>
+            <span class="what">Run the skill in an instrumented Harbor sandbox, watch the file-system
+              diff and outbound network in real time, and let the security judge confirm or refute the
+              static finding.</span>
+          </div>
+        </div>
+        <p class="contrast-evidence">
+          Across 227 skills:  <b>241</b> static findings.  <b>93</b> were confirmed end-to-end
+          triggered (38.6 %).  The other 148 are pattern matches the dynamic test could not exploit
+          — false positives a static-only tool would still report as risk.
         </p>
-
-        <div class="subdim">
-          <div class="name"><strong>2a. Existence  (static)</strong><code>existence_confidence</code></div>
-          <p>Static scanner output answering: <em>does this risk objectively exist in the skill
-            code?</em> Range <code>[0, 1]</code> with calibrated tiers (1.0 unambiguous → 0.2 likely
-            false positive).</p>
-        </div>
-
-        <div class="subdim">
-          <div class="name"><strong>2b. Exploitability  (dynamic)</strong><code>exploitability</code></div>
-          <p>LLM Security Judge output combining run trajectory, verifier rule checks, and the
-            static finding's predicted trigger path. Five-tier verdict from <code>confirmed</code>
-            (≥ 0.85, end-to-end attack path) down to <code>likely_false_positive</code>.</p>
-        </div>
-
-        <div class="subdim">
-          <div class="name"><strong>Score</strong><code>security_score</code></div>
-          <code class="formula">deduction_i = base_score(severity) × existence_i × exploitability_i
-security_score  = max(10, 100 - Σ_i deduction_i)</code>
-          <div class="severity-row" aria-label="Base scores by severity">
-            <div class="severity-pill is-h"><span class="label">High</span><span class="val">15</span></div>
-            <div class="severity-pill is-m"><span class="label">Med</span><span class="val">10</span></div>
-            <div class="severity-pill is-l"><span class="label">Low</span><span class="val">5</span></div>
-          </div>
-          <div class="note">
-            Probability semantics: <code>P(risk) = P(exists) × P(exploitable | exists)</code>.
-            Floor of 10 avoids negative-score ambiguity; defaults of <code>0.6</code> apply when a
-            measurement is absent.
-          </div>
-        </div>
       </article>
 
     </div>
   </section>
 
-  <!-- ============================ EVIDENCE / CASE STUDIES ============================ -->
-  <section id="evidence" class="reveal">
-    <div class="section-head">
-      <span class="kicker">Real evidence</span>
-      <h2>Three skills.  Three deployment verdicts.</h2>
-      <p class="lead">
-        These are not synthetic illustrations. Each card is rendered from the actual
-        <code>skill_report.json</code> emitted by the framework — judge reasoning, finding rationale,
-        and severity weights are taken verbatim. Together they show the three regimes a developer
-        actually encounters at adoption time.
-      </p>
-    </div>
-    <div class="bento" id="bento" aria-busy="true">
-      <article class="case-study"><span class="skeleton" style="width:180px"></span><h3 style="margin-top:14px">&nbsp;</h3></article>
-      <article class="case-study"><span class="skeleton" style="width:140px"></span><h3 style="margin-top:14px">&nbsp;</h3></article>
-      <article class="case-study"><span class="skeleton" style="width:140px"></span><h3 style="margin-top:14px">&nbsp;</h3></article>
-    </div>
-  </section>
-
-  <!-- ============================ DISTRIBUTIONS + EXPLORER ============================ -->
+  <!-- ==================== EXPLORE (browse + distributions) ==================== -->
   <section id="explore" class="reveal">
     <div class="section-head">
-      <span class="kicker">The full evaluation</span>
-      <h2>Across the suite — distributions and a searchable index.</h2>
+      <span class="kicker">Across the suite</span>
+      <h2>Browse all 227 skills.</h2>
       <p class="lead">
-        The histograms below are computed from all <strong>227</strong> skills.
-        Most skills cluster in a narrow effectiveness band; safety scores are bimodal — a long
-        right-tail of clean skills, plus a small but high-severity left-tail.
+        Click any row to load that skill's verdict at the top of the page. Distributions are computed
+        live from the same data — most skills cluster in a narrow effectiveness band, and safety scores
+        are <strong>bimodal</strong>: a long right-tail of clean skills plus a small high-severity left-tail.
       </p>
     </div>
 
     <div class="dist-row">
       <div class="dist-card">
-        <div class="dist-head">
-          <h4>Effectiveness gain</h4>
-          <span class="right">pass_rate_gain</span>
-        </div>
+        <div class="dist-head"><h4>Effectiveness gain</h4><span class="right">pass_rate_gain</span></div>
         <div id="dist-gain"></div>
-        <p class="dist-foot"><strong>Bucketed in 0.10 steps.</strong>  227 skills × 1.0 = the maximum unlock; most fall in 0.0–0.4.</p>
+        <p class="dist-foot"><strong>Buckets of 0.10.</strong>  226 skills were measured; most fall in 0.0–0.4.</p>
       </div>
       <div class="dist-card">
-        <div class="dist-head">
-          <h4>Efficiency</h4>
-          <span class="right">efficiency_score</span>
-        </div>
+        <div class="dist-head"><h4>Efficiency</h4><span class="right">efficiency_score</span></div>
         <div id="dist-eff"></div>
-        <p class="dist-foot"><strong>Skills tend to add overhead.</strong>  A high-effectiveness skill may still pay token / time cost — these axes diverge.</p>
+        <p class="dist-foot"><strong>Skills usually add overhead.</strong>  Capability and resource savings diverge.</p>
       </div>
       <div class="dist-card">
-        <div class="dist-head">
-          <h4>Safety score</h4>
-          <span class="right">security_score</span>
-        </div>
+        <div class="dist-head"><h4>Safety score</h4><span class="right">security_score</span></div>
         <div id="dist-safety"></div>
-        <p class="dist-foot"><strong>Bimodal.</strong>  Most skills sit at 90+; a small group below 50 contains real, dynamically-confirmed exploits.</p>
+        <p class="dist-foot"><strong>Bimodal.</strong>  Most skills sit at 90+; a small group below 50 contains real exploits.</p>
       </div>
     </div>
 
@@ -327,18 +213,14 @@ security_score  = max(10, 100 - Σ_i deduction_i)</code>
       <div class="explorer-toolbar">
         <label class="search-input" for="explorer-search">
           <span class="icon">⌕</span>
-          <input id="explorer-search" type="search" placeholder="Search skills, owners, categories…" autocomplete="off" spellcheck="false">
+          <input id="explorer-search" type="search" placeholder="Filter by name, owner, category…" autocomplete="off" spellcheck="false">
         </label>
         <div class="toolbar-group">
           <label for="explorer-category">Category</label>
           <select id="explorer-category"><option>All categories</option></select>
         </div>
       </div>
-
-      <div class="explorer-meta" id="explorer-meta">
-        <span>—</span>
-      </div>
-
+      <div class="explorer-meta" id="explorer-meta"><span>—</span></div>
       <table class="explorer-table" aria-label="All evaluated skills">
         <thead>
           <tr>
@@ -353,7 +235,6 @@ security_score  = max(10, 100 - Σ_i deduction_i)</code>
           <tr><td colspan="5" class="explorer-empty">Loading 227 skills…</td></tr>
         </tbody>
       </table>
-
       <div class="explorer-foot">
         <button id="explorer-prev" type="button" disabled>← prev</button>
         <span id="explorer-page">page 1 / 1</span>
@@ -362,107 +243,60 @@ security_score  = max(10, 100 - Σ_i deduction_i)</code>
     </div>
   </section>
 
-  <!-- ============================ PIPELINE ============================ -->
-  <section id="pipeline" class="reveal">
+  <!-- ==================== HOW IT WORKS ==================== -->
+  <section id="how" class="reveal">
     <div class="section-head">
-      <span class="kicker">Pipeline</span>
-      <h2>From skill package to scored evidence.</h2>
+      <span class="kicker">Method</span>
+      <h2>How a skill becomes a verdict.</h2>
       <p class="lead">
-        Given <code>K = (D, F, M)</code> — documentation, files, metadata — SkillTestBench
-        compiles each skill into verifier-backed Harbor tasks and emits a single evidence bundle
-        from which both axes are computed.
+        Given <code>K = (D, F, M)</code> — documentation, files, metadata — every skill goes through
+        the same five-step pipeline. The same execution pass produces both axes.
       </p>
     </div>
     <ol class="pipeline" aria-label="SkillTestBench pipeline">
-      <li class="pipe-step">
-        <span class="step-num">1</span>
-        <h4>Profile</h4>
-        <p>Static scan of <code>SKILL.md</code>, scripts, and metadata to extract claimed capabilities and risk findings.</p>
-      </li>
-      <li class="pipe-step">
-        <span class="step-num">2</span>
-        <h4>Generate</h4>
-        <p>Capability-targeted scenarios (U1 / U2 / U3) with 5–6 judge items each, calibrated against the no-skill baseline.</p>
-      </li>
-      <li class="pipe-step">
-        <span class="step-num">3</span>
-        <h4>Execute</h4>
-        <p>Containerized Harbor runs, paired wi / wo with matched seeds. Sandbox records FS diff and outbound network in real time.</p>
-      </li>
-      <li class="pipe-step">
-        <span class="step-num">4</span>
-        <h4>Judge</h4>
-        <p>LLM judge scores binary item completion; security judge fuses verifier rule checks with semantic analysis.</p>
-      </li>
-      <li class="pipe-step">
-        <span class="step-num">5</span>
-        <h4>Report</h4>
-        <p>Per-skill <code>skill_report.json</code> with <code>pass_rate_gain</code>, <code>efficiency_score</code>, and <code>security.score</code>.</p>
-      </li>
+      <li class="pipe-step"><span class="step-num">1</span><h4>Profile</h4><p>Static scan of <code>SKILL.md</code>, scripts, and metadata to extract claimed capabilities and risk findings.</p></li>
+      <li class="pipe-step"><span class="step-num">2</span><h4>Generate</h4><p>Capability-targeted scenarios (U1 / U2 / U3) with 5–6 judge items each, calibrated against the no-skill baseline.</p></li>
+      <li class="pipe-step"><span class="step-num">3</span><h4>Execute</h4><p>Containerized Harbor runs, paired wi / wo with matched seeds. Sandbox records FS diff and outbound network in real time.</p></li>
+      <li class="pipe-step"><span class="step-num">4</span><h4>Judge</h4><p>LLM judge scores binary item completion; security judge fuses verifier rule checks with semantic analysis.</p></li>
+      <li class="pipe-step"><span class="step-num">5</span><h4>Report</h4><p>Per-skill <code>skill_report.json</code> with <code>pass_rate_gain</code>, <code>efficiency_score</code>, and <code>security.score</code>.</p></li>
     </ol>
-  </section>
 
-  <!-- ============================ EXTENSION ============================ -->
-  <section id="extension" class="reveal">
-    <div class="section-head">
-      <span class="kicker">In-the-wild discovery</span>
-      <h2>SkillTestBench at the point of adoption.</h2>
-      <p class="lead">
-        A Chrome MV3 extension recognizes skill-format repositories on GitHub by their
-        <code>SKILL.md</code> structure, queries the evaluation server, and renders a compact
-        two-axis panel directly on the repository page — before the developer installs anything.
-      </p>
-    </div>
-
-    <div class="ext-grid">
-      <ol class="ext-steps">
-        <li>
-          <strong>Open <code>chrome://extensions</code>.</strong>
-          <span>Enable <em>Developer mode</em> in the top-right corner.</span>
-        </li>
-        <li>
-          <strong>Click <em>Load unpacked</em>.</strong>
-          <span>Select the <code>chrome_extension/</code> directory from the source tree.</span>
-        </li>
-        <li>
-          <strong>Start the local evaluation server.</strong>
-          <span>Run <code>python local_mock_server/mock_skill_server.py</code> on port 8765.</span>
-        </li>
-        <li>
-          <strong>Visit any skill repository on GitHub.</strong>
-          <span>The two-axis panel injects automatically wherever a <code>SKILL.md</code> is detected.</span>
-        </li>
-      </ol>
-
-      <aside class="ext-mock" aria-label="Extension panel preview">
-        <div class="ext-mock-head">
-          <span class="url">github.com / anthropics / mcp-builder</span>
-          <span>SkillTestBench</span>
-        </div>
-        <div class="ext-mock-body">
-          <h4>Adoption-time panel</h4>
-          <div class="ext-row"><span class="lab">Effectiveness gain</span><span class="val up">+16.7 pp</span></div>
-          <div class="ext-row"><span class="lab">Efficiency</span><span class="val">0.31</span></div>
-          <div class="ext-row"><span class="lab">Safety score</span><span class="val up">96 / 100</span></div>
-          <div class="ext-row"><span class="lab">Findings  (H / M / L)</span><span class="val">0 / 0 / 0</span></div>
-          <div class="ext-row"><span class="lab">Scenarios evaluated</span><span class="val">8</span></div>
-          <div class="ext-row"><span class="lab">Decision</span><span class="val up">Adopt</span></div>
-        </div>
-      </aside>
+    <div class="framework-mini">
+      <article class="framework-card is-utility">
+        <h3>Utility &mdash; <em>two independent dimensions</em></h3>
+        <ul class="bullets">
+          <li><b>Effectiveness</b> &mdash; <code>pass_rate_gain</code> &mdash; the proportion of judge items
+            the skill <em>additionally unlocks</em> beyond the baseline. <code>(wi_passed - wo_passed) / total_items</code>
+            when wi exceeds wo, otherwise 0.</li>
+          <li><b>Efficiency</b> &mdash; <code>efficiency_score</code> &mdash; mean of clamped time and
+            effective-token savings. Reported only when both runs completed at least one item, and
+            never combined with effectiveness into a single number.</li>
+        </ul>
+      </article>
+      <article class="framework-card is-safety">
+        <h3>Safety &mdash; <em>existence × exploitability</em></h3>
+        <ul class="bullets">
+          <li><b>Existence</b> &mdash; <code>existence_confidence ∈ [0, 1]</code> &mdash; static scanner
+            estimate of whether the risk objectively exists in the skill code.</li>
+          <li><b>Exploitability</b> &mdash; <code>exploitability ∈ [0, 1]</code> &mdash; LLM Security
+            Judge estimate of whether the risk can actually be triggered, given runtime trace and
+            verifier checks.</li>
+          <li><b>Score</b> &mdash; <code>max(10, 100 - Σ base × existence × exploit)</code>, with
+            base scores 15 / 10 / 5 for H / M / L severities.</li>
+        </ul>
+      </article>
     </div>
   </section>
 
-  <!-- ============================ CITATION ============================ -->
+  <!-- ==================== CITATION ==================== -->
   <section id="cite" class="reveal">
     <div class="section-head">
       <span class="kicker">Citation</span>
       <h2>Cite SkillTestBench.</h2>
       <p class="lead">
-        The bibliographic record below is anonymized in line with NeurIPS 2026 double-blind policy.
-        Author and DOI fields will be filled in upon decision notification.
+        Anonymized for double-blind review. Author and DOI fields will be filled in upon decision notification.
       </p>
     </div>
-
     <div class="cite">
       <h4>BibTeX</h4>
       <pre id="bibtex">@inproceedings{skilltestbench2026,
@@ -482,15 +316,15 @@ security_score  = max(10, 100 - Σ_i deduction_i)</code>
   <div class="foot-grid">
     <div class="foot-brand">
       <strong>SkillTestBench</strong>
-      <p>Skill-as-input evaluation for agent skill packages.<br>
-        NeurIPS 2026 submission &middot; under double-blind review.</p>
+      <p>Look up the evidence behind any agent skill.<br>
+        NeurIPS 2026 submission · under double-blind review.</p>
     </div>
     <div>
       <h5>Paper</h5>
       <ul>
         <li><a href="paper/neurips_2026.pdf">NeurIPS 2026 PDF</a></li>
         <li><a href="#cite">Citation</a></li>
-        <li><a href="#framework">Framework</a></li>
+        <li><a href="#how">How it works</a></li>
       </ul>
     </div>
     <div>
@@ -502,11 +336,11 @@ security_score  = max(10, 100 - Σ_i deduction_i)</code>
       </ul>
     </div>
     <div>
-      <h5>Adoption</h5>
+      <h5>Use it</h5>
       <ul>
-        <li><a href="#extension">Browser extension</a></li>
-        <li><a href="#pipeline">Pipeline</a></li>
-        <li><a href="#explore">Skill explorer</a></li>
+        <li><a href="#verdict">Look up a skill</a></li>
+        <li><a href="#explore">Browse all 227</a></li>
+        <li><a href="#different">What's different</a></li>
       </ul>
     </div>
   </div>
