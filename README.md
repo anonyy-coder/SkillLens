@@ -17,7 +17,7 @@ The companion landing page is at
 > **Anonymous artifact for NeurIPS 2026 double-blind review.**
 > Author identity, affiliations, citations, and full corpus details will be revealed
 > after the review period. The repository under
-> `github.com/anonyy-coder/skilllens-eval` and its dependency
+> `github.com/anonyy-coder/SkillLens` and its dependency
 > `github.com/anonyy-coder/harbor` (an Apache-2.0 fork of `laude-institute/harbor`)
 > were created solely to host anonymized review materials.
 
@@ -46,8 +46,8 @@ The companion landing page is at
 
 ```bash
 # 1. Clone the artifact and the vendored Harbor fork
-git clone https://github.com/anonyy-coder/skilllens-eval.git
-cd skilllens-eval
+git clone https://github.com/anonyy-coder/SkillLens.git
+cd SkillLens
 
 # 2. Create a virtual environment and install (Python 3.12+)
 uv venv
@@ -131,7 +131,7 @@ even when a corpus has thousands of historic rollouts.
 ## Repository layout
 
 ```
-skilllens-eval/
+SkillLens/
 ├── README.md                     ← this file
 ├── LICENSE                       ← Apache-2.0
 ├── NOTICE                        ← attribution for the Harbor fork
@@ -432,7 +432,7 @@ in that file for the exact penalty arithmetic.
 The paper's headline numbers were obtained on a frozen corpus. To reproduce
 them end-to-end:
 
-1. **Pin versions.** Use this commit of `skilllens-eval` together with the
+1. **Pin versions.** Use this commit of the repository together with the
    pinned Harbor SHA `bce6a018f70418daefc5c4f9aedd14cd1c79b907` from `pyproject.toml`. Re-installing
    without the pin can pick up upstream Harbor changes that alter task
    semantics.

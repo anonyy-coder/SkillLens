@@ -18,8 +18,8 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/anonyy-coder/skilllens-eval"
-Repository = "https://github.com/anonyy-coder/skilllens-eval"
+Homepage = "https://github.com/anonyy-coder/SkillLens"
+Repository = "https://github.com/anonyy-coder/SkillLens"
 
 [project.scripts]
 # Console scripts only wrap zero-arg main() functions. The four scheme/task

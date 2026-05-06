@@ -11,8 +11,8 @@ title: >-
 authors:
   - name: "Anonymous Authors"
 date-released: "2026-05-07"
-url: "https://github.com/anonyy-coder/skilllens-eval"
-repository-code: "https://github.com/anonyy-coder/skilllens-eval"
+url: "https://github.com/anonyy-coder/SkillLens"
+repository-code: "https://github.com/anonyy-coder/SkillLens"
 license: Apache-2.0
 type: software
 keywords:
