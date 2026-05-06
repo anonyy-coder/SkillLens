@@ -1,0 +1,41 @@
+# YAML 1.2
+# https://citation-file-format.github.io/
+cff-version: 1.2.0
+message: >-
+  If you use this software, please cite the SkillLens paper. The full
+  citation will be revealed after the NeurIPS 2026 double-blind review
+  period concludes.
+title: >-
+  SkillLens: From Task-First Evaluation to Skill-Centered Assessment
+  (anonymous artifact)
+authors:
+  - name: "Anonymous Authors"
+date-released: "2026-05-07"
+url: "https://github.com/anonyy-coder/skilllens-eval"
+repository-code: "https://github.com/anonyy-coder/skilllens-eval"
+license: Apache-2.0
+type: software
+keywords:
+  - large-language-models
+  - agent-evaluation
+  - skill-assessment
+  - benchmark
+  - llm-agents
+abstract: >-
+  SkillLens is an evaluation framework that measures the incremental
+  task-completion gain that an Anthropic-style /skill markdown file
+  provides to a coding or research agent, on top of a baseline run
+  without the skill. It pairs scheme generation, sandboxed task
+  execution via Harbor, and an LLM judge that scores both utility
+  (capability gain) and security (exploitability of skill
+  contents). This repository is the anonymous artifact accompanying
+  the paper submitted to NeurIPS 2026.
+preferred-citation:
+  type: conference-paper
+  authors:
+    - name: "Anonymous Authors"
+  title: >-
+    SkillLens: From Task-First Evaluation to Skill-Centered Assessment
+  year: 2026
+  conference:
+    name: "NeurIPS 2026 (under double-blind review)"
